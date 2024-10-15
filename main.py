@@ -7,7 +7,7 @@ from lista_cadastros import ListaCadastros
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Sistema de Cadastro de Livros")
+        self.setWindowTitle("Sistema de Cadastro de Livros - Sinfy")
         self.setMinimumSize(900, 600)
 
         # Stacked Widget para alternar entre telas

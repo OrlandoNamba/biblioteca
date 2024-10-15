@@ -17,7 +17,7 @@ class JanelaCadastro(QWidget):
         titulo = QtWidgets.QLabel("Cadastro de Livros", self)
         titulo.setFont(QtGui.QFont("Arial", 24, QtGui.QFont.Bold))
         titulo.setAlignment(QtCore.Qt.AlignCenter)
-        titulo.setStyleSheet("color: #DDB7AC;")  # Cor do título
+        titulo.setStyleSheet("color: #512D7B;")  # Cor do título
         layout.addWidget(titulo)
 
         # Campos de entrada
@@ -33,14 +33,25 @@ class JanelaCadastro(QWidget):
         # Botões
         botao_cadastrar = QPushButton("Cadastrar", self)
         botao_cadastrar.clicked.connect(self.cadastrar)
-        botao_cadastrar.setStyleSheet("background-color: #DDB7AC; color: white; border-radius: 5px; padding: 10px;")
+        botao_cadastrar.setStyleSheet("background-color: #512D7B; color: white; border-radius: 5px; padding: 10px;")
+        botao_cadastrar.setFixedSize(150, 40)  # Ajusta o tamanho dos botões (largura, altura)
         
         botao_lista = QPushButton("Ver Cadastros", self)
         botao_lista.clicked.connect(self.show_lista_callback)
-        botao_lista.setStyleSheet("background-color: #DDB7AC; color: white; border-radius: 5px; padding: 10px;")
+        botao_lista.setStyleSheet("background-color: #512D7B; color: white; border-radius: 5px; padding: 10px;")
+        botao_lista.setFixedSize(150, 40)  # Ajusta o tamanho dos botões (largura, altura)
 
-        layout.addWidget(botao_cadastrar)
-        layout.addWidget(botao_lista)
+        # Adicionando os botões dentro de um layout horizontal para centralizar
+        botao_layout = QtWidgets.QHBoxLayout()
+
+        # Adicionando "spacers" para centralizar os botões
+        botao_layout.addStretch()  # Espaço vazio à esquerda
+        botao_layout.addWidget(botao_cadastrar)
+        botao_layout.addWidget(botao_lista)
+        botao_layout.addStretch()  # Espaço vazio à direita
+
+        # Adiciona o layout dos botões ao layout principal vertical
+        layout.addLayout(botao_layout)
 
         self.setLayout(layout)
         self.atualizar_generos_combobox()
@@ -48,10 +59,10 @@ class JanelaCadastro(QWidget):
     def criar_campo(self, label_text, layout):
         """Cria um campo de entrada com rótulo e adiciona ao layout fornecido."""
         label = QLabel(label_text)
-        label.setStyleSheet("color: #DDB7AC;")  # Cor do rótulo
+        label.setStyleSheet("color: #5E5E61;")  # Cor do rótulo
         entrada = QLineEdit(self)
         entrada.setPlaceholderText(f"Digite o {label_text.lower()}")
-        entrada.setStyleSheet("background-color: #FFFFFF; border: 1px solid #999B85; border-radius: 5px; padding: 5px; font-size: 12px;")  # Cor do fundo alterada
+        entrada.setStyleSheet("background-color: #FFFFFF; border: 1px solid #B96EC8; border-radius: 5px; padding: 5px; font-size: 14px;")  # Cor do fundo alterada
         
         layout.addWidget(label)
         layout.addWidget(entrada)
@@ -60,9 +71,9 @@ class JanelaCadastro(QWidget):
     def criar_campo_genero(self, label_text, layout):
         """Cria o campo de seleção de gênero com rótulo e adiciona ao layout fornecido."""
         label = QLabel(label_text)
-        label.setStyleSheet("color: #DDB7AC;")  # Cor do rótulo
+        label.setStyleSheet("color: #5E5E61;")  # Cor do rótulo
         combo_box = QComboBox(self)
-        combo_box.setStyleSheet("background-color: #FFFFFF; border: 1px solid #999B85; border-radius: 5px; padding: 8px; font-size: 14px;")  # Cor do fundo alterada
+        combo_box.setStyleSheet("background-color: #FFFFFF; border: 1px solid #B96EC8; border-radius: 5px; padding: 5px; font-size: 14px;")  # Cor do fundo alterada
         
         layout.addWidget(label)
         layout.addWidget(combo_box)
@@ -110,4 +121,7 @@ class JanelaCadastro(QWidget):
     def atualizar_generos_combobox(self):
         generos = self.carregar_generos()
         self.combobox_genero.clear()
+        self.combobox_genero.addItem("Selecione o gênero")  # Adiciona a opção inicial
         self.combobox_genero.addItems(generos)
+        self.combobox_genero.setCurrentIndex(0)  # Define a opção "Selecione o gênero" como a padrão
+
