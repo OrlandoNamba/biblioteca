@@ -4,8 +4,9 @@ from PyQt5.QtWidgets import (
     QHBoxLayout, QTableWidget, QTableWidgetItem,
     QDialog, QLineEdit, QMessageBox
 )
-from PyQt5 import QtWidgets
 from PyQt5 import QtGui, QtCore
+from PyQt5 import QtWidgets
+
 
 class ListaCadastros(QWidget):
     def __init__(self, voltar_callback):
