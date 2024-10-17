@@ -59,7 +59,7 @@ class JanelaCadastro(QWidget):
     def criar_campo(self, label_text, layout):
         """Cria um campo de entrada com rótulo e adiciona ao layout fornecido."""
         label = QLabel(label_text)
-        label.setStyleSheet("color: #5E5E61;")  # Cor do rótulo
+        label.setStyleSheet("color: #5E5E61;")  # Cor do rótulo do campo
         entrada = QLineEdit(self)
         entrada.setPlaceholderText(f"Digite o {label_text.lower()}")
         entrada.setStyleSheet("background-color: #FFFFFF; border: 1px solid #B96EC8; border-radius: 5px; padding: 5px; font-size: 14px;")  # Cor do fundo alterada
@@ -124,4 +124,3 @@ class JanelaCadastro(QWidget):
         self.combobox_genero.addItem("Selecione o gênero")  # Adiciona a opção inicial
         self.combobox_genero.addItems(generos)
         self.combobox_genero.setCurrentIndex(0)  # Define a opção "Selecione o gênero" como a padrão
-
