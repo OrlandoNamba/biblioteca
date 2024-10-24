@@ -43,43 +43,51 @@ class JanelaCadastro(QWidget):
         # Campos de entrada
         self.nome_input = QLineEdit(self)
         self.nome_input.setPlaceholderText("Digite o nome do livro")
-        self.nome_input.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        self.nome_input.setMinimumSize(200, 30)  # Tamanho mínimo
+        self.nome_input.setMaximumSize(400, 30)  # Tamanho máximo
 
         self.autor_combo = QComboBox(self)
         self.autor_combo.setEditable(True)
         self.autor_combo.lineEdit().setPlaceholderText("Selecione ou digite o autor")
-        self.autor_combo.lineEdit().focusInEvent = lambda event: self.autor_combo.showPopup()
-        self.autor_combo.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        self.autor_combo.setMinimumSize(200, 30)  # Tamanho mínimo
+        self.autor_combo.setMaximumSize(400, 30)  # Tamanho máximo
 
         self.editora_combo = QComboBox(self)
         self.editora_combo.setEditable(True)
         self.editora_combo.lineEdit().setPlaceholderText("Selecione ou digite a editora")
-        self.editora_combo.lineEdit().focusInEvent = lambda event: self.editora_combo.showPopup()
-        self.editora_combo.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        self.editora_combo.setMinimumSize(200, 30)  # Tamanho mínimo
+        self.editora_combo.setMaximumSize(400, 30)  # Tamanho máximo
 
         self.isbn_input = QLineEdit(self)
         self.isbn_input.setPlaceholderText("Digite o ISBN do livro")
-        self.isbn_input.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        self.isbn_input.setMinimumSize(200, 30)  # Tamanho mínimo
+        self.isbn_input.setMaximumSize(400, 30)  # Tamanho máximo
 
         self.paginas_input = QLineEdit(self)
         self.paginas_input.setPlaceholderText("Digite o número de páginas")
-        self.paginas_input.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        self.paginas_input.setMinimumSize(200, 30)  # Tamanho mínimo
+        self.paginas_input.setMaximumSize(400, 30)  # Tamanho máximo
 
         self.genero_combo = QComboBox(self)
         self.genero_combo.setEditable(True)
         self.genero_combo.lineEdit().setPlaceholderText("Selecione ou digite o gênero")
-        self.genero_combo.lineEdit().focusInEvent = lambda event: self.genero_combo.showPopup()
-        self.genero_combo.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        self.genero_combo.setMinimumSize(200, 30)  # Tamanho mínimo
+        self.genero_combo.setMaximumSize(400, 30)  # Tamanho máximo
+
 
         # Botões
         self.limpar_button = QPushButton("Limpar", self)
-        self.limpar_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        self.limpar_button.setMinimumSize(100, 30)  # Tamanho mínimo
+        self.limpar_button.setMaximumSize(150, 30)  # Tamanho máximo
 
         self.cadastrar_button = QPushButton("Cadastrar", self)
-        self.cadastrar_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        self.cadastrar_button.setMinimumSize(100, 30)  # Tamanho mínimo
+        self.cadastrar_button.setMaximumSize(150, 30)  # Tamanho máximo
 
         self.exibir_button = QPushButton("Exibir Cadastros", self)
-        self.exibir_button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        self.exibir_button.setMinimumSize(100, 30)  # Tamanho mínimo
+        self.exibir_button.setMaximumSize(250, 100)  # Tamanho máximo
+
 
         # Layout para os botões
         botoes_layout = QHBoxLayout()
