@@ -1,5 +1,5 @@
-from PyQt5.QtWidgets import QLineEdit, QComboBox, QPushButton, QVBoxLayout, QWidget, QMessageBox
 import sqlite3
+from PyQt5.QtWidgets import QLineEdit, QComboBox, QPushButton, QVBoxLayout, QWidget, QMessageBox
 
 class JanelaCadastro(QWidget):
     def __init__(self):
@@ -15,43 +15,27 @@ class JanelaCadastro(QWidget):
         # Campos de entrada
         self.nome_input = QLineEdit(self)
         self.nome_input.setPlaceholderText("Digite o nome do livro")
-        self.nome_input.setStyleSheet("color: #5E5E61;")  # Cor do texto
 
         self.autor_combo = QComboBox(self)
         self.autor_combo.setEditable(True)
-        self.autor_combo.setStyleSheet("color: #5E5E61;")  # Cor do texto do combobox
         self.autor_combo.lineEdit().setPlaceholderText("Selecione ou digite o autor")
+        self.autor_combo.lineEdit().focusInEvent = lambda event: self.autor_combo.showPopup()
 
         self.editora_combo = QComboBox(self)
         self.editora_combo.setEditable(True)
-        self.editora_combo.setStyleSheet("color: #5E5E61;")  # Cor do texto do combobox
         self.editora_combo.lineEdit().setPlaceholderText("Selecione ou digite a editora")
+        self.editora_combo.lineEdit().focusInEvent = lambda event: self.editora_combo.showPopup()
 
         self.isbn_input = QLineEdit(self)
         self.isbn_input.setPlaceholderText("Digite o ISBN do livro")
-        self.isbn_input.setStyleSheet("color: #5E5E61;")  # Cor do texto
 
         self.paginas_input = QLineEdit(self)
         self.paginas_input.setPlaceholderText("Digite o número de páginas")
-        self.paginas_input.setStyleSheet("color: #5E5E61;")  # Cor do texto
 
         self.genero_combo = QComboBox(self)
         self.genero_combo.setEditable(True)
-        self.genero_combo.setStyleSheet("color: #5E5E61;")  # Cor do texto do combobox
         self.genero_combo.lineEdit().setPlaceholderText("Selecione ou digite o gênero")
-
-        # Conectar os sinais
-        self.autor_combo.lineEdit().textChanged.connect(lambda: self.atualizar_placeholder(self.autor_combo))
-        self.autor_combo.lineEdit().editingFinished.connect(lambda: self.restore_placeholder(self.autor_combo))
-        self.autor_combo.lineEdit().editingFinished.connect(lambda: self.adicionar_item_combo(self.autor_combo))
-
-        self.editora_combo.lineEdit().textChanged.connect(lambda: self.atualizar_placeholder(self.editora_combo))
-        self.editora_combo.lineEdit().editingFinished.connect(lambda: self.restore_placeholder(self.editora_combo))
-        self.editora_combo.lineEdit().editingFinished.connect(lambda: self.adicionar_item_combo(self.editora_combo))
-
-        self.genero_combo.lineEdit().textChanged.connect(lambda: self.atualizar_placeholder(self.genero_combo))
-        self.genero_combo.lineEdit().editingFinished.connect(lambda: self.restore_placeholder(self.genero_combo))
-        self.genero_combo.lineEdit().editingFinished.connect(lambda: self.adicionar_item_combo(self.genero_combo))
+        self.genero_combo.lineEdit().focusInEvent = lambda event: self.genero_combo.showPopup()
 
         # Botões
         self.cadastrar_button = QPushButton("Cadastrar", self)
@@ -59,8 +43,6 @@ class JanelaCadastro(QWidget):
 
         self.limpar_button = QPushButton("Limpar", self)
         self.limpar_button.clicked.connect(self.limpar_campos)
-
-        self.exibir_button = QPushButton("Exibir Cadastros", self)
 
         # Adiciona os widgets ao layout
         layout.addWidget(self.nome_input)
@@ -71,49 +53,42 @@ class JanelaCadastro(QWidget):
         layout.addWidget(self.genero_combo)
         layout.addWidget(self.cadastrar_button)
         layout.addWidget(self.limpar_button)
-        layout.addWidget(self.exibir_button)
 
         self.setLayout(layout)
 
-    def eventFilter(self, source, event):
-        if event.type() == 6:  # Focus In Event
-            if source in (self.autor_combo.lineEdit(), self.editora_combo.lineEdit(), self.genero_combo.lineEdit()):
-                source.parent().showPopup()  # Mostra o popup do combobox
-        return super().eventFilter(source, event)
+        # Carregar os dados no QComboBox ao iniciar
+        self.carregar_dados_combo()
 
-    def atualizar_placeholder(self, combo):
-        # Define o texto do placeholder conforme o tipo de campo
-        if combo.lineEdit().text().strip() == "":
-            if combo == self.autor_combo:
-                combo.lineEdit().setPlaceholderText("Selecione ou digite o autor")
-            elif combo == self.editora_combo:
-                combo.lineEdit().setPlaceholderText("Selecione ou digite a editora")
-            elif combo == self.genero_combo:
-                combo.lineEdit().setPlaceholderText("Selecione ou digite o gênero")
-            else:
-                combo.lineEdit().setPlaceholderText("Selecione ou digite tal coisa")  # Texto padrão para outros campos
-        else:
-            # Remove o texto de placeholder
-            if combo.lineEdit().text() == "Selecione tal coisa":
-                combo.lineEdit().setText("")  # Remove o texto de placeholder
+    def carregar_dados_combo(self):
+        """Carrega os autores, editoras e gêneros já cadastrados no banco de dados."""
+        try:
+            conn = sqlite3.connect('biblioteca.db')
+            cursor = conn.cursor()
 
-    def restore_placeholder(self, combo):
-        # Restaura o placeholder se o campo estiver vazio ao sair
-        if combo.lineEdit().text().strip() == "":
-            if combo == self.autor_combo:
-                combo.lineEdit().setPlaceholderText("Selecione ou digite o autor")
-            elif combo == self.editora_combo:
-                combo.lineEdit().setPlaceholderText("Selecione ou digite a editora")
-            elif combo == self.genero_combo:
-                combo.lineEdit().setPlaceholderText("Selecione ou digite o gênero")
-            else:
-                combo.lineEdit().setPlaceholderText("Selecione ou digite tal coisa")  # Texto padrão para outros campos
+            # Carregar autores
+            autores = cursor.execute("SELECT DISTINCT autor FROM livros").fetchall()
+            self.autor_combo.clear()  # Limpa itens antes de recarregar
+            self.autor_combo.addItem("")  # Adiciona item vazio para mostrar o placeholder
+            for autor in autores:
+                self.autor_combo.addItem(autor[0])
 
-    def adicionar_item_combo(self, combo):
-        # Adiciona o item digitado ao combobox se não existir
-        item = combo.lineEdit().text().strip()
-        if item and item not in [combo.itemText(i) for i in range(combo.count())]:
-            combo.addItem(item)
+            # Carregar editoras
+            editoras = cursor.execute("SELECT DISTINCT editora FROM livros").fetchall()
+            self.editora_combo.clear()  # Limpa itens antes de recarregar
+            self.editora_combo.addItem("")  # Adiciona item vazio para mostrar o placeholder
+            for editora in editoras:
+                self.editora_combo.addItem(editora[0])
+
+            # Carregar gêneros
+            generos = cursor.execute("SELECT DISTINCT genero FROM livros").fetchall()
+            self.genero_combo.clear()  # Limpa itens antes de recarregar
+            self.genero_combo.addItem("")  # Adiciona item vazio para mostrar o placeholder
+            for genero in generos:
+                self.genero_combo.addItem(genero[0])
+
+            conn.close()
+        except sqlite3.Error as e:
+            QMessageBox.critical(self, "Erro", f"Ocorreu um erro ao carregar os dados: {e}")
 
     def cadastrar_livro(self):
         # Coleta os dados dos campos
@@ -139,16 +114,14 @@ class JanelaCadastro(QWidget):
             conn.close()
             QMessageBox.information(self, "Sucesso", "Livro cadastrado com sucesso!")
             self.limpar_campos()  # Limpa os campos após o cadastro
+            self.carregar_dados_combo()  # Atualiza os dados nos comboboxes
         except sqlite3.Error as e:
             QMessageBox.critical(self, "Erro", f"Ocorreu um erro ao cadastrar o livro: {e}")
 
     def limpar_campos(self):
         self.nome_input.clear()
-        self.autor_combo.lineEdit().setText("")  # Limpa o campo do combobox
-        self.autor_combo.lineEdit().setPlaceholderText("Selecione ou digite o autor")  # Restaura o placeholder
-        self.editora_combo.lineEdit().setText("")  # Limpa o campo do combobox
-        self.editora_combo.lineEdit().setPlaceholderText("Selecione ou digite a editora")  # Restaura o placeholder
+        self.autor_combo.lineEdit().clear()  # Limpa o campo do autor
+        self.editora_combo.lineEdit().clear()  # Limpa o campo da editora
         self.isbn_input.clear()
         self.paginas_input.clear()
-        self.genero_combo.lineEdit().setText("")  # Limpa o campo do combobox
-        self.genero_combo.lineEdit().setPlaceholderText("Selecione ou digite o gênero")  # Restaura o placeholder
+        self.genero_combo.lineEdit().clear()  # Limpa o campo do gênero
