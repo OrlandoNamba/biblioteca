@@ -21,15 +21,11 @@ class JanelaCadastro(QWidget):
         self.autor_combo.setEditable(True)
         self.autor_combo.setStyleSheet("color: #5E5E61;")  # Cor do texto do combobox
         self.autor_combo.lineEdit().setPlaceholderText("Selecione ou digite o autor")
-        self.autor_combo.lineEdit().textChanged.connect(lambda: self.atualizar_placeholder(self.autor_combo, "Selecione ou digite o autor"))
-        self.autor_combo.lineEdit().editingFinished.connect(lambda: self.restore_placeholder(self.autor_combo, "Selecione ou digite o autor"))
 
         self.editora_combo = QComboBox(self)
         self.editora_combo.setEditable(True)
         self.editora_combo.setStyleSheet("color: #5E5E61;")  # Cor do texto do combobox
         self.editora_combo.lineEdit().setPlaceholderText("Selecione ou digite a editora")
-        self.editora_combo.lineEdit().textChanged.connect(lambda: self.atualizar_placeholder(self.editora_combo, "Selecione ou digite a editora"))
-        self.editora_combo.lineEdit().editingFinished.connect(lambda: self.restore_placeholder(self.editora_combo, "Selecione ou digite a editora"))
 
         self.isbn_input = QLineEdit(self)
         self.isbn_input.setPlaceholderText("Digite o ISBN do livro")
@@ -43,8 +39,19 @@ class JanelaCadastro(QWidget):
         self.genero_combo.setEditable(True)
         self.genero_combo.setStyleSheet("color: #5E5E61;")  # Cor do texto do combobox
         self.genero_combo.lineEdit().setPlaceholderText("Selecione ou digite o gênero")
-        self.genero_combo.lineEdit().textChanged.connect(lambda: self.atualizar_placeholder(self.genero_combo, "Selecione ou digite o gênero"))
-        self.genero_combo.lineEdit().editingFinished.connect(lambda: self.restore_placeholder(self.genero_combo, "Selecione ou digite o gênero"))
+
+        # Conectar os sinais
+        self.autor_combo.lineEdit().textChanged.connect(lambda: self.atualizar_placeholder(self.autor_combo))
+        self.autor_combo.lineEdit().editingFinished.connect(lambda: self.restore_placeholder(self.autor_combo))
+        self.autor_combo.lineEdit().editingFinished.connect(lambda: self.adicionar_item_combo(self.autor_combo))
+
+        self.editora_combo.lineEdit().textChanged.connect(lambda: self.atualizar_placeholder(self.editora_combo))
+        self.editora_combo.lineEdit().editingFinished.connect(lambda: self.restore_placeholder(self.editora_combo))
+        self.editora_combo.lineEdit().editingFinished.connect(lambda: self.adicionar_item_combo(self.editora_combo))
+
+        self.genero_combo.lineEdit().textChanged.connect(lambda: self.atualizar_placeholder(self.genero_combo))
+        self.genero_combo.lineEdit().editingFinished.connect(lambda: self.restore_placeholder(self.genero_combo))
+        self.genero_combo.lineEdit().editingFinished.connect(lambda: self.adicionar_item_combo(self.genero_combo))
 
         # Botões
         self.cadastrar_button = QPushButton("Cadastrar", self)
@@ -68,24 +75,45 @@ class JanelaCadastro(QWidget):
 
         self.setLayout(layout)
 
-    def atualizar_placeholder(self, combo, placeholder_text):
-        # Se o campo estiver vazio, define o placeholder
+    def eventFilter(self, source, event):
+        if event.type() == 6:  # Focus In Event
+            if source in (self.autor_combo.lineEdit(), self.editora_combo.lineEdit(), self.genero_combo.lineEdit()):
+                source.parent().showPopup()  # Mostra o popup do combobox
+        return super().eventFilter(source, event)
+
+    def atualizar_placeholder(self, combo):
+        # Define o texto do placeholder conforme o tipo de campo
         if combo.lineEdit().text().strip() == "":
-            combo.lineEdit().setPlaceholderText(placeholder_text)  # Define o texto do placeholder
+            if combo == self.autor_combo:
+                combo.lineEdit().setPlaceholderText("Selecione ou digite o autor")
+            elif combo == self.editora_combo:
+                combo.lineEdit().setPlaceholderText("Selecione ou digite a editora")
+            elif combo == self.genero_combo:
+                combo.lineEdit().setPlaceholderText("Selecione ou digite o gênero")
+            else:
+                combo.lineEdit().setPlaceholderText("Selecione ou digite tal coisa")  # Texto padrão para outros campos
         else:
             # Remove o texto de placeholder
-            if combo.lineEdit().text() == placeholder_text:
+            if combo.lineEdit().text() == "Selecione tal coisa":
                 combo.lineEdit().setText("")  # Remove o texto de placeholder
 
-    def restore_placeholder(self, combo, placeholder_text):
+    def restore_placeholder(self, combo):
         # Restaura o placeholder se o campo estiver vazio ao sair
         if combo.lineEdit().text().strip() == "":
-            combo.lineEdit().setPlaceholderText(placeholder_text)  # Restaura o placeholder
+            if combo == self.autor_combo:
+                combo.lineEdit().setPlaceholderText("Selecione ou digite o autor")
+            elif combo == self.editora_combo:
+                combo.lineEdit().setPlaceholderText("Selecione ou digite a editora")
+            elif combo == self.genero_combo:
+                combo.lineEdit().setPlaceholderText("Selecione ou digite o gênero")
+            else:
+                combo.lineEdit().setPlaceholderText("Selecione ou digite tal coisa")  # Texto padrão para outros campos
 
-    def remover_placeholder(self, combo):
-        # Remove o placeholder se um item for selecionado
-        if combo.currentIndex() != 0:  # Se não for o item de placeholder
-            combo.lineEdit().setPlaceholderText("")  # Limpa o placeholder
+    def adicionar_item_combo(self, combo):
+        # Adiciona o item digitado ao combobox se não existir
+        item = combo.lineEdit().text().strip()
+        if item and item not in [combo.itemText(i) for i in range(combo.count())]:
+            combo.addItem(item)
 
     def cadastrar_livro(self):
         # Coleta os dados dos campos
