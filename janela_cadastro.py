@@ -1,5 +1,8 @@
 import sqlite3
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QPushButton, QComboBox, QStackedWidget, QSizePolicy, QMessageBox, QLabel, QSpacerItem
+from PyQt5.QtWidgets import (
+    QWidget, QVBoxLayout, QHBoxLayout, QLineEdit, QPushButton,
+    QComboBox, QStackedWidget, QSizePolicy, QMessageBox, QLabel, QSpacerItem
+)
 from PyQt5.QtCore import Qt
 
 from lista_cadastros import ListaCadastros
@@ -39,7 +42,11 @@ class JanelaCadastro(QWidget):
         self.titulo = QLabel("Cadastrar Livros", self)
         self.titulo.setStyleSheet("font-size: 24px; font-weight: bold;")
         self.titulo.setAlignment(Qt.AlignCenter)  # Centraliza o título
+        self.titulo.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)  # Título expansível
         layout.addWidget(self.titulo, alignment=Qt.AlignTop)  # Alinhamento superior para o título
+
+        # Adiciona um espaço maior abaixo do título
+        layout.addItem(QSpacerItem(0, 30, QSizePolicy.Minimum, QSizePolicy.Expanding))  # Espaço de 30px abaixo do título
 
         # Campos de entrada
         self.nome_input = self.criar_campo("Nome do Livro")
@@ -50,15 +57,11 @@ class JanelaCadastro(QWidget):
         self.genero_combo = self.criar_combo("Gênero")
 
         # Adiciona os layouts dos campos ao layout principal
-        layout.addLayout(self.nome_input[0])  # Adiciona o layout do nome
-        layout.addLayout(self.autor_combo[0])  # Adiciona o layout do autor
-        layout.addLayout(self.editora_combo[0])  # Adiciona o layout da editora
-        layout.addLayout(self.isbn_input[0])  # Adiciona o layout do ISBN
-        layout.addLayout(self.paginas_input[0])  # Adiciona o layout do número de páginas
-        layout.addLayout(self.genero_combo[0])  # Adiciona o layout do gênero
+        for campo in [self.nome_input, self.autor_combo, self.editora_combo, self.isbn_input, self.paginas_input, self.genero_combo]:
+            layout.addLayout(campo[0])  # Adiciona o layout do campo
 
         # Adiciona um espaço responsivo abaixo do campo de gênero
-        layout.addItem(QSpacerItem(0, 20, QSizePolicy.Minimum, QSizePolicy.Expanding))  # Adiciona espaço de 20px abaixo
+        layout.addItem(QSpacerItem(0, 20, QSizePolicy.Minimum, QSizePolicy.Expanding))  # Espaço de 20px abaixo dos campos
 
         # Armazena os campos em atributos para uso posterior
         self.nome_field = self.nome_input[1]
@@ -73,6 +76,10 @@ class JanelaCadastro(QWidget):
         self.cadastrar_button = QPushButton("Cadastrar", self)
         self.exibir_button = QPushButton("Exibir Cadastros", self)
 
+        # Definir políticas de tamanho para os botões
+        for button in [self.limpar_button, self.cadastrar_button, self.exibir_button]:
+            button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+
         # Conectar o botão de exibir cadastros à função de mudança de tela
         self.exibir_button.clicked.connect(self.exibir_cadastros)
 
@@ -83,6 +90,9 @@ class JanelaCadastro(QWidget):
         botoes_layout.addWidget(self.cadastrar_button)
         botoes_layout.addStretch()  # Espaço entre o botão cadastrar e exibir
         botoes_layout.addWidget(self.exibir_button)
+
+        # Adiciona um espaço maior acima dos botões
+        layout.addItem(QSpacerItem(0, 30, QSizePolicy.Minimum, QSizePolicy.Expanding))  # Espaço de 30px acima dos botões
 
         # Adiciona os botões ao layout
         layout.addLayout(botoes_layout)
@@ -105,13 +115,14 @@ class JanelaCadastro(QWidget):
 
         campo = QLineEdit(self)
         campo.setPlaceholderText(f"Digite {placeholder.lower()}")
+        campo.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)  # Ajusta o campo para ser expansível verticalmente também
 
         layout.addWidget(rotulo)  # Adiciona o rótulo
         layout.addWidget(campo)  # Adiciona o campo ao lado do rótulo
 
         # Ajustar o espaçamento entre o rótulo e o campo
-        layout.setContentsMargins(0, 5, 0, 0)  # Margens: superior com 5px para afastar do título
-        layout.setSpacing(10)  # Ajusta o espaço entre o rótulo e o campo
+        layout.setContentsMargins(0, 15, 0, 15)  # Margens: superior com 15px para afastar do título
+        layout.setSpacing(5)  # Ajusta o espaço entre o rótulo e o campo
 
         return layout, campo  # Retorna o layout e o campo
 
@@ -125,13 +136,14 @@ class JanelaCadastro(QWidget):
         combo = QComboBox(self)
         combo.setEditable(True)
         combo.lineEdit().setPlaceholderText(f"Selecione ou digite {placeholder.lower()}")
+        combo.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)  # Ajusta o combo para ser expansível verticalmente também
 
         layout.addWidget(rotulo)  # Adiciona o rótulo
         layout.addWidget(combo)  # Adiciona o combo ao lado do rótulo
 
         # Ajustar o espaçamento entre o rótulo e o combo
-        layout.setContentsMargins(0, 5, 0, 0)  # Margens: superior com 5px para afastar do título
-        layout.setSpacing(10)  # Ajusta o espaço entre o rótulo e o combo
+        layout.setContentsMargins(0, 15, 0, 15)  # Margens: superior com 15px para afastar do título
+        layout.setSpacing(5)  # Ajusta o espaço entre o rótulo e o combo
 
         return layout, combo  # Retorna o layout e o combo
 
@@ -163,48 +175,11 @@ class JanelaCadastro(QWidget):
                 self.genero_field.addItem(genero[0])
 
             conn.close()
-        except sqlite3.Error as e:
-            QMessageBox.critical(self, "Erro", f"Ocorreu um erro ao carregar os dados: {e}")
-
-    def cadastrar_livro(self):
-        # Coleta os dados dos campos
-        nome = self.nome_field.text().strip()
-        autor = self.autor_field.currentText().strip() or self.autor_field.lineEdit().text().strip()
-        editora = self.editora_field.currentText().strip() or self.editora_field.lineEdit().text().strip()
-        isbn = self.isbn_field.text().strip()
-        paginas = self.paginas_field.text().strip()
-        genero = self.genero_field.currentText().strip() or self.genero_field.lineEdit().text().strip()
-
-        # Validação dos campos
-        if not nome or not autor or not editora or not isbn or not paginas or not genero:
-            QMessageBox.warning(self, "Erro", "Por favor, preencha todos os campos.")
-            return
-
-        # Lógica de inserção no banco de dados
-        try:
-            conn = sqlite3.connect('biblioteca.db')
-            cursor = conn.cursor()
-            cursor.execute("INSERT INTO livros (nome, autor, editora, isbn, paginas, genero) VALUES (?, ?, ?, ?, ?, ?)",
-                           (nome, autor, editora, isbn, paginas, genero))
-            conn.commit()
-            conn.close()
-
-            QMessageBox.information(self, "Sucesso", "Livro cadastrado com sucesso!")
-            self.limpar_campos()  # Limpa os campos após cadastro
-        except sqlite3.Error as e:
-            QMessageBox.critical(self, "Erro", f"Ocorreu um erro ao cadastrar o livro: {e}")
-
-    def limpar_campos(self):
-        """Limpa todos os campos de entrada."""
-        self.nome_field.clear()
-        self.autor_field.clear()
-        self.editora_field.clear()
-        self.isbn_field.clear()
-        self.paginas_field.clear()
-        self.genero_field.clear()
+        except Exception as e:
+            QMessageBox.critical(self, "Erro", str(e))
 
     def exibir_cadastros(self):
-        """Altera para a tela de lista de cadastros."""
+        """Exibe a tela de lista de cadastros."""
         self.stacked_widget.setCurrentWidget(self.lista_widget)
 
 # Executar a aplicação
